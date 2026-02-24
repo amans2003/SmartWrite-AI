@@ -61,8 +61,8 @@ app.use(express.static(distPath));
 app.use(express.static(rootDistPath));
 
 // Catch-all route for React client-side routing
-app.get("/(.*)", (req, res) => {
-    if (req.url.startsWith('/api')) {
+app.get("/:path*", (req, res) => {
+    if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: "API route not found" });
     }
 
@@ -71,7 +71,8 @@ app.get("/(.*)", (req, res) => {
         if (err) {
             res.sendFile(path.join(rootDistPath, "index.html"), (err2) => {
                 if (err2) {
-                    res.status(500).send("Static files not found during deployment.");
+                    console.error("Static file missing:", { distPath, rootDistPath });
+                    res.status(500).send("Static files missing during deployment.");
                 }
             });
         }
