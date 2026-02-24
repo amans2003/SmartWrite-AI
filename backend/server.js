@@ -59,7 +59,7 @@ app.use(express.static(distPath));
 app.use(express.static(rootDistPath));
 
 // Catch-all route for React client-side routing
-app.get("*", (req, res) => {
+app.get("/(.*)", (req, res) => {
     if (req.url.startsWith('/api')) {
         return res.status(404).json({ error: "API route not found" });
     }
