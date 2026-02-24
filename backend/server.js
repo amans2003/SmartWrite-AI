@@ -61,22 +61,22 @@ app.use(express.static(distPath));
 app.use(express.static(rootDistPath));
 
 // Catch-all route for React client-side routing
-// Catch-all route for React client-side routing
-// Express 5.x: Named parameters or plain '*' are handled differently. 
-// '/*' is a safe way to capture all subpaths in some versions, but 
-// let's use the most explicit named wildcard syntax.
-app.get("/*", (req, res) => {
+// Express 5.0 strictly requires named parameters for wildcards!
+app.get("/:any*", (req, res) => {
+    // Prevent infinite loops for API calls
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: "API route not found" });
     }
 
-    // Try primary path, fallback to secondary
-    res.sendFile(path.join(distPath, "index.html"), (err) => {
+    // Serve index.html for all other routes so React Router can handle them
+    const indexPath = path.join(distPath, "index.html");
+    res.sendFile(indexPath, (err) => {
         if (err) {
-            res.sendFile(path.join(rootDistPath, "index.html"), (err2) => {
+            const fallbackPath = path.join(rootDistPath, "index.html");
+            res.sendFile(fallbackPath, (err2) => {
                 if (err2) {
-                    console.error("Static file missing:", { distPath, rootDistPath });
-                    res.status(500).send("Static files missing during deployment.");
+                    console.error("Critical: Static files missing", { distPath, rootDistPath });
+                    res.status(500).send("Static assets missing. Please check build logs.");
                 }
             });
         }
