@@ -61,7 +61,11 @@ app.use(express.static(distPath));
 app.use(express.static(rootDistPath));
 
 // Catch-all route for React client-side routing
-app.get("/:path*", (req, res) => {
+// Catch-all route for React client-side routing
+// Express 5.x: Named parameters or plain '*' are handled differently. 
+// '/*' is a safe way to capture all subpaths in some versions, but 
+// let's use the most explicit named wildcard syntax.
+app.get("/*", (req, res) => {
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: "API route not found" });
     }
