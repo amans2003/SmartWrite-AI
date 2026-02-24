@@ -15,10 +15,12 @@ app.use(express.json());
 app.get("/api/health", (req, res) => {
     res.json({
         status: "ok",
-        env: {
+        diagnostics: {
+            dirname: __dirname,
+            cwd: process.cwd(),
+            node_version: process.version,
             hasMongo: !!process.env.MONGODB_URI,
-            hasGemini: !!process.env.GEMINI_API_KEY,
-            nodeEnv: process.env.NODE_ENV
+            hasGemini: !!process.env.GEMINI_API_KEY
         }
     });
 });
