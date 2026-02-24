@@ -24,8 +24,7 @@ function App() {
 
   const fetchHistory = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
-      const response = await fetch(`${apiUrl}/api/ai/history`)
+      const response = await fetch('/api/ai/history')
       const data = await response.json()
       setHistory(data)
     } catch (error) {
@@ -37,8 +36,7 @@ function App() {
     if (!inputText) return
     setIsLoading(true)
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
-      const response = await fetch(`${apiUrl}/api/ai/rewrite`, {
+      const response = await fetch('/api/ai/rewrite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: inputText, tone, context, length })
@@ -71,8 +69,7 @@ function App() {
   const handleClearHistory = async () => {
     if (window.confirm('Are you sure you want to clear all history?')) {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5001'
-        await fetch(`${apiUrl}/api/ai/history`, { method: 'DELETE' })
+        await fetch('/api/ai/history', { method: 'DELETE' })
         setHistory([])
         setActiveHistoryId(null)
       } catch (error) {

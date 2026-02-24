@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const path = require("path");
 const aiRoutes = require("./routes/ai");
 
 const app = express();
@@ -16,6 +17,14 @@ mongoose.connect(process.env.MONGODB_URI)
     .catch((err) => console.error("MongoDB connection error:", err));
 
 app.use("/api/ai", aiRoutes);
+
+// Serving Frontend static files
+app.use(express.static(path.join(__dirname, "dist")));
+
+// Catch-all route for React client-side routing
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
 
 app.get("/health", (req, res) => {
     res.json({ status: "ok" });
