@@ -66,7 +66,7 @@ app.use(express.static(rootDistPath));
 
 // Catch-all route for React client-side routing
 // Express 5.0 strictly requires named parameters for wildcards!
-app.get("/:any*", (req, res) => {
+app.get("/{*any}", (req, res) => {
     // Prevent infinite loops for API calls
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ error: "API route not found" });
