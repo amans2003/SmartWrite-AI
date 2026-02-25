@@ -8,6 +8,10 @@ const aiRoutes = require("./routes/ai");
 const app = express();
 const PORT = process.env.PORT || 5001;
 
+console.log(">>> SMARTWRITE SERVER STARTING UP <<<");
+console.log("Version: 2026-02-25-v2");
+console.log("Express Version Check:", require('express/package.json').version);
+
 app.use(cors());
 app.use(express.json());
 
