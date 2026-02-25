@@ -9,7 +9,8 @@ router.get("/history", async (req, res) => {
         const history = await History.find().sort({ timestamp: -1 }).limit(50);
         res.json(history);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Fetch History Error:", error);
+        res.status(500).json({ error: "Failed to fetch history" });
     }
 });
 
@@ -19,7 +20,8 @@ router.delete("/history", async (req, res) => {
         await History.deleteMany({});
         res.json({ message: "History cleared" });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("Clear History Error:", error);
+        res.status(500).json({ error: "Failed to clear history" });
     }
 });
 

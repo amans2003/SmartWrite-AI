@@ -25,10 +25,20 @@ function App() {
   const fetchHistory = async () => {
     try {
       const response = await fetch('/api/ai/history')
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Server responded with ${response.status}`);
+      }
       const data = await response.json()
-      setHistory(data)
+      if (Array.isArray(data)) {
+        setHistory(data)
+      } else {
+        console.error('Expected array from history API, got:', data)
+        setHistory([])
+      }
     } catch (error) {
       console.error('Error fetching history:', error)
+      setHistory([])
     }
   }
 
@@ -41,8 +51,12 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: inputText, tone, context, length })
       })
-      const data = await response.json()
-      if (data.error) throw new Error(data.error)
+
+      const data = await response.json().catch(() => ({ error: "Invalid server response" }))
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error || `Request failed with status ${response.status}`)
+      }
 
       setOutput({ subject: data.subject, content: data.content })
 

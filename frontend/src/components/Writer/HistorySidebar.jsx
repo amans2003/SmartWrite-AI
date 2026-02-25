@@ -14,22 +14,22 @@ const HistorySidebar = ({ history, onLoadHistory, onClearHistory, activeId }) =>
             </div>
 
             <div className="history-list">
-                {history.length === 0 ? (
+                {!Array.isArray(history) || history.length === 0 ? (
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center', marginTop: 'var(--space-xl)' }}>
-                        No previous chats found.
+                        {!Array.isArray(history) ? "Failed to load history." : "No previous chats found."}
                     </p>
                 ) : (
                     history.map((item) => (
                         <div
-                            key={item.id}
-                            className={`history-item ${activeId === item.id ? 'active' : ''}`}
+                            key={item._id || item.id}
+                            className={`history-item ${activeId === (item._id || item.id) ? 'active' : ''}`}
                             onClick={() => onLoadHistory(item)}
                         >
                             <div className="history-item-header">
                                 <span className="history-tag">{item.tone}</span>
                                 <span className="history-date">{new Date(item.timestamp).toLocaleDateString()}</span>
                             </div>
-                            <p className="history-preview">{item.inputText.substring(0, 60)}...</p>
+                            <p className="history-preview">{item.inputText?.substring(0, 60)}...</p>
                         </div>
                     ))
                 )}

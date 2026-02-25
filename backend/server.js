@@ -33,24 +33,32 @@ app.get("/api/health", (req, res) => {
 const connectDB = async () => {
     if (!process.env.MONGODB_URI) {
         console.error("MONGODB_URI is missing");
-        return;
+        return false;
     }
-    if (mongoose.connection.readyState >= 1) return;
+    if (mongoose.connection.readyState >= 1) return true;
 
     try {
         await mongoose.connect(process.env.MONGODB_URI, {
             serverSelectionTimeoutMS: 5000
         });
         console.log("Connected to MongoDB Atlas");
+        return true;
     } catch (err) {
         console.error("MongoDB connection error:", err.message);
+        return false;
     }
 };
 
 // Middleware for API routes to ensure DB connection
 app.use(async (req, res, next) => {
     if (req.url.startsWith('/api') && req.url !== '/api/health') {
-        await connectDB();
+        const connected = await connectDB();
+        if (!connected) {
+            return res.status(503).json({
+                error: "Database connection failed",
+                tip: "Check your MONGODB_URI environment variable and database status."
+            });
+        }
     }
     next();
 });
