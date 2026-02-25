@@ -46,17 +46,33 @@ router.post("/rewrite", async (req, res) => {
             content = parts.slice(1).join("\n").trim();
         }
 
-        // Save to MongoDB
-        const historyItem = new History({
-            inputText: text,
-            tone: tone || "Professional",
-            length: length || "Medium",
-            context: context || "General",
-            output: { subject, content }
-        });
-        await historyItem.save();
+        // Save to MongoDB (Optional - don't crash if it fails)
+        let historySaved = false;
+        let historyItem = null;
 
-        res.json({ subject, content, _id: historyItem._id, timestamp: historyItem.timestamp });
+        if (req.dbConnected !== false) {
+            try {
+                historyItem = new History({
+                    inputText: text,
+                    tone: tone || "Professional",
+                    length: length || "Medium",
+                    context: context || "General",
+                    output: { subject, content }
+                });
+                await historyItem.save();
+                historySaved = true;
+            } catch (dbError) {
+                console.error("Failed to save history:", dbError.message);
+            }
+        }
+
+        res.json({
+            subject,
+            content,
+            _id: historyItem?._id,
+            timestamp: historyItem?.timestamp || new Date(),
+            warning: historySaved ? null : "History could not be saved because the database is unavailable."
+        });
     } catch (error) {
         console.error("Rewrite Error Detail:", error);
 

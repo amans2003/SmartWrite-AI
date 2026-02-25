@@ -53,12 +53,17 @@ const connectDB = async () => {
 app.use(async (req, res, next) => {
     if (req.url.startsWith('/api') && req.url !== '/api/health') {
         const connected = await connectDB();
-        if (!connected) {
+
+        // Critical routes: block if DB is down
+        if (!connected && (req.url.includes('/history') || req.method === 'DELETE')) {
             return res.status(503).json({
                 error: "Database connection failed",
-                tip: "Check your MONGODB_URI environment variable and database status."
+                tip: "History features are currently unavailable. Check your database status."
             });
         }
+
+        // Non-critical routes: proceed anyway (will handle errors locally in route)
+        req.dbConnected = connected;
     }
     next();
 });
